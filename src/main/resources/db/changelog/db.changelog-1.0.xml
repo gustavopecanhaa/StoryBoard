@@ -1,0 +1,96 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="1" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="story_board"/>
+            </not>
+        </preConditions>
+        <createTable tableName="story_board">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="is_finalized" type="TINYINT(1)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="dev">
+        <createTable tableName="board_column">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="story_board_id" type="BIGINT">
+                <constraints foreignKeyName="fk_column_story_board" referencedTableName="story_board" referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(50)"/>
+            <column name="column_order" type="INT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="dev">
+        <createTable tableName="card">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="column_id" type="BIGINT">
+                <constraints foreignKeyName="fk_card_column" referencedTableName="board_column" referencedColumnNames="id"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="creation_date" type="DATETIME"/>
+            <column name="column_entry_time" type="DATETIME"/>
+            <column name="is_blocked" type="TINYINT(1)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="dev">
+        <createTable tableName="blocked_card_history">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="card_id" type="BIGINT">
+                <constraints foreignKeyName="fk_history_card" referencedTableName="card"/>
+            </column>
+            <column name="reason" type="TEXT"/>
+            <column name="blocked_status" type="TINYINT(1)"/>
+            <column name="created_at" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="dev">
+        <createTable tableName="card_movement_history">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="card_id" type="BIGINT">
+                <constraints foreignKeyName="fk_movement_card" referencedTableName="card"/>
+            </column>
+            <column name="from_column_id" type="BIGINT">
+                <constraints foreignKeyName="fk_from_column" referencedTableName="board_column"/>
+            </column>
+            <column name="to_column_id" type="BIGINT">
+                <constraints foreignKeyName="fk_to_column" referencedTableName="board_column"/>
+            </column>
+            <column name="moved_at" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="6" author="dev" runOnChange="true"> <!-- Força reexecução se houver mudanças -->
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_board_column_story_board"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint
+                baseTableName="board_column"
+                baseColumnNames="story_board_id"
+                constraintName="fk_board_column_story_board"
+                referencedTableName="story_board"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
