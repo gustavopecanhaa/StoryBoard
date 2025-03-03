@@ -113,7 +113,7 @@ Imagine um escritor utilizando o **Storyboard Manager** para desenvolver seu rom
 
 1. **Clone o Repositório:**
    ```bash
-   git clone <URL-do-repositório>
+   git clone https://github.com/gustavopecanhaa/StoryBoard
    ```
 
 2. **Configure o Banco de Dados:**
